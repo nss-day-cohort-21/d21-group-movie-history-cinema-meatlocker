@@ -9,24 +9,28 @@ let firebase = require("./fb-Config"),
 
 //listen for change state:
 firebase.auth().onAuthStateChanged((user) => {
-    console.log("onAuthStateChanged", user);
+    // console.log("onAuthStateChanged", user);
     if (user) {
         currentUser = user.uid;
-        console.log("current user Logged in?", currentUser);
+        // console.log("current user Logged in?", currentUser);
     } else {
         currentUser = null;
-        console.log("current user NOT logged in:", currentUser);
+        // console.log("current user NOT logged in:", currentUser);
     }
 });
 
 //login
 function logInGoogle() {
     //Add a .then when called
+    $("#auth-btn").attr('disabled', true);
+	$("#logout").attr('disabled', false);
     return firebase.auth().signInWithPopup(provider);
 }
 
 //logout
 function logOut() {
+    $("#auth-btn").attr('disabled', false);
+	$("#logout").attr('disabled', true);
     return firebase.auth().signOut();
 }
 

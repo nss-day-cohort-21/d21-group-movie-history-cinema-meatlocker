@@ -12,6 +12,23 @@ let userInput = "";
 let apiLink = "https://api.themoviedb.org/3/search/movie?api_key=dbe82c339d871418f3be9db2647bb249&language=en-US&query=";
 
 
+////////////////////////////////////////////////////////
+// Slider things
+////////////////////////////////////////////////////////
+
+    /***Slider***/
+        var slider = document.getElementById("mySlider");
+        var output = document.getElementById("sliderPut");
+        output.innerHTML = ("Stars: " + slider.value); // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function() {
+            output.innerHTML = ("Stars: " + this.value);
+        };
+
+
+    /******/
+
 
 //after user hits enter, load
 document.getElementById("dbSearch").addEventListener("keyup", function(event) {
@@ -20,16 +37,24 @@ document.getElementById("dbSearch").addEventListener("keyup", function(event) {
        event.preventDefault();
 //The below two lines clear the HTML and movie array so that each new search will present only movies that match the latest search
         $("#forHandlebarsInsert").html();
+        arrayOfMoviesFromSearch = [];
 
 
         db.getApiMovies()
             .then(function(movieData) {
                 movieData.results.forEach(function(movie) {
-                    arrayOfMoviesFromSearch = [];
+                    // arrayOfMoviesFromSearch = [];
                     buildMovieObj(movie);
                     // console.log("movie", movie);
 
                 });
+                console.log("arrayOfMoviesFromSearch at end of search:", arrayOfMoviesFromSearch);
+                if(arrayOfMoviesFromSearch.length === 0){
+                    console.log("no movies found");
+                    $("#forHandlebarsInsert").html(`<div id="null-search"><h1>No results found!</h1></div>`);
+                } else {
+                    console.log("FOUND arrayOfMoviesFromSearch at end of search function:", arrayOfMoviesFromSearch);
+                }
             });
     }
 });
@@ -40,10 +65,10 @@ document.getElementById("dbSearch").addEventListener("keyup", function(event) {
 // User login section and Display uid movies
 ////////////////////////////////////////////////////////
 $("#auth-btn").click(function() {
-    console.log("clicked auth");
+    // console.log("clicked auth");
     user.logInGoogle()
         .then((result) => {
-            console.log("result from login", result.user.uid);
+            // console.log("result from login", result.user.uid);
             user.setUser(result.user.uid);
             let currentUser = result.user.uid;
             $("#auth-btn").addClass("is-hidden");
@@ -54,10 +79,11 @@ $("#auth-btn").click(function() {
 
 // user logout
 $("#logout").click(() => {
-    console.log("logout clicked");
+    // console.log("logout clicked");
     user.logOut();
     $("#logout").addClass("is-hidden");
     $("#auth-btn").removeClass("is-hidden");
+    $("#forHandlebarsInsert").html(`<div id="logout-message"><h1>Logged Out!</h1></div>`);
 });
 
 
@@ -65,16 +91,36 @@ $("#logout").click(() => {
 // Build Object
 ////////////////////////////////////////////////////////
 function buildMovieObj(movie) {
-    db.addCast(movie.id)
-        .then((result) => {
+    // db.addCast(movie.id)
+    //     .then((result) => {
+    
+    let movieYear;
+    if (movie.release_date) {
+        movieYear = movie.release_date.slice(0, 4);
+    } else {
+        movieYear = "Release date not listed";
+    }
+
+    let largePoster;
+    let smallPoster;
+    if (movie.poster_path) {
+        largePoster = "https://image.tmdb.org/t/p/w342/" + movie.poster_path;
+        smallPoster = "https://image.tmdb.org/t/p/w185/" + movie.poster_path;
+    } else {
+        largePoster = "./img/posterDefaultLarge.jpg";
+        smallPoster = "./img/posterDefaultSmall.jpg";
+    }
 
     let movieObj = {
         //movie id #
         id: movie.id,
         title: movie.title,
-        poster: movie.poster_path,
-        year: movie.release_date,
-        actors: result,
+        poster_path: movie.poster_path,
+        largeposter: largePoster,
+        smallposter: smallPoster,
+        overview: movie.overview,
+        year: movieYear,
+        // actors: result,
         watch: false,
         watched: false,
         rating: 0,
@@ -85,7 +131,7 @@ function buildMovieObj(movie) {
     templates.populatePageBeforeTracked(arrayOfMoviesFromSearch);
     // console.log ("arrayOfMoviesFromSearch", arrayOfMoviesFromSearch);
     // This is handling the RateYo rating functionality
-    });
+    // });
     // return movieObj;
     // console.log($(".rateStars"));
     // // debugger;
@@ -102,28 +148,147 @@ function buildMovieObj(movie) {
 
 
 //////////////////////////////////////////////////////////////////////////
+// Button Disables
+//////////////////////////////////////////////////////////////////////////
+
+let thisTarjeh = null;
+
+
+//Click Funtion for Untracked button
+    $("#untracked-btn").click(function(){
+        console.log("clicked on untracked-btn toggle button");
+        if (thisTarjeh === null) {
+            console.log("untracked if statement running");
+            $(this).siblings().attr('disabled', false);
+            thisTarjeh = $(this);
+            console.log("thisTarjeh = ", thisTarjeh);
+        }else{
+            console.log("untracked-btn else statement running");
+            thisTarjeh.siblings().attr('disabled', false);
+            thisTarjeh = $(this);
+            thisTarjeh.siblings().attr('disabled', false);
+        }
+        $("#untracked-btn").attr('disabled', true);
+    });
+
+    // Click Funtion for Watched button
+    $("#watched-btn").click(function(){
+        console.log("clicked on Watched toggle button");
+        loadMoviesToDOM();
+        if (thisTarjeh === null) {
+            console.log("watched if statement running");
+            $(this).siblings().attr('disabled', false);
+            thisTarjeh = $(this);
+            console.log("thisTarjeh = ", thisTarjeh);
+        }else{
+            console.log("watched else statement running");
+            thisTarjeh.siblings().attr('disabled', false);
+            thisTarjeh = $(this);
+            thisTarjeh.siblings().attr('disabled', false);
+        }
+        $("#watched-btn").attr('disabled', true);
+    });
+
+    //Click Funtion for Unwatched button
+    $("#unwatched-btn").click(function(){ 
+        console.log("clicked on Unwatched toggle button");
+        if (thisTarjeh === null) {
+            console.log("unwatched if statement running");
+            $(this).siblings().attr('disabled', false);
+            thisTarjeh = $(this);
+            console.log("thisTarjeh = ", thisTarjeh);
+        }else{
+            console.log("unwatched else statement running");
+            thisTarjeh.siblings().attr('disabled', false);
+            thisTarjeh = $(this);
+            thisTarjeh.siblings().attr('disabled', false);
+        }
+        $("#unwatched-btn").attr('disabled', true);
+    });
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
 // Click function that trigger FB interactions & Reload DOM
 //////////////////////////////////////////////////////////////////////////
 
 //when the use clicks the '+ My Movies' button, the array of returned API results are looped through to find a the object with matching movie ID from user click. That single movie object is then sent to Firebase.
 $(document).on("click", ".addToUserMovies", function(event) {
+    // console.log("click save new movie", event.currentTarget.id);
+    
+    console.log("event for click on add movie", event);
     console.log("click save new movie", event.currentTarget.id);
-
-    for (let i=0; i < arrayOfMoviesFromSearch.length; i++) {
-        if (event.currentTarget.id == arrayOfMoviesFromSearch[i].id ) {
-            // console.log ("FOUND A MATCH!");
-            db.addMovie(arrayOfMoviesFromSearch[i]);
+    console.log("user.getUser()", user.getUser());
+    $(this).attr('disabled', true);
+    if(user.getUser() == null) {
+        user.logInGoogle()
+        .then((result) => {
+            // console.log("result from login", result.user.uid);
+            user.setUser(result.user.uid);
+            let currentUser = result.user.uid;
+            $("#auth-btn").addClass("is-hidden");
+            $("#logout").removeClass("is-hidden");
+            db.getApiMovies()
+            .then(function(movieData) {
+                movieData.results.forEach(function(movie) {
+                    // arrayOfMoviesFromSearch = [];
+                    buildMovieObj(movie);
+                    // console.log("movie", movie);
+                });
+                console.log("arrayOfMoviesFromSearch at end of search function:", arrayOfMoviesFromSearch);
+            });
+        });
+    }else{
+        for (let i=0; i < arrayOfMoviesFromSearch.length; i++) {
+            if (event.currentTarget.id == arrayOfMoviesFromSearch[i].id ) {
+                // console.log ("FOUND A MATCH!");
+                db.addMovie(arrayOfMoviesFromSearch[i]);
+            }
         }
     }
 });
 
 
+
 //button to show only movies added to 'tracked' by the user
-$(document).on("click", "#unwatched-btn", function(event) {
-    console.log ("clicked unwatched");
-    loadMoviesToDOM();
-    // console.log("click save new movie", event.currentTarget.id);
+// $(document).on("click", "#watched-btn", function(event) {
+//     console.log ("clicked watched");
+//     loadMoviesToDOM();
+//     // console.log("click save new movie", event.currentTarget.id);
+// });
+
+// class="open-modal btn btn-info btn-lg"
+$(document).on("click", ".modal-open-button", function(event) {
+    console.log(event);
+    console.log("open modal clicked - event:", event.currentTarget.getAttribute("movie-id"));
+
+    let movieID = event.currentTarget.getAttribute("movie-id");
+
+    db.addCast(movieID)
+    .then((castOutput) => {
+
+        let movieObjectForModal = findMovieForModal(movieID);
+        movieObjectForModal.cast = castOutput;
+
+        console.log("movieToDisplay", movieObjectForModal);
+        templates.populateModalBeforeTracked(movieObjectForModal);
+        
+    });
+
 });
+
+
+
+function findMovieForModal (movieID) {   
+
+    let selectedMovie = arrayOfMoviesFromSearch.find((array) => {
+                        return(array.id == movieID);
+                        });
+
+    return selectedMovie;
+}
 
 
     //call to database
@@ -156,34 +321,35 @@ $(document).on("click", "#unwatched-btn", function(event) {
 //         });
 // });
 $(document).on("click", ".deleteFromMovies", function(event) {
-    console.log("click delete new movie", event.currentTarget.id);
+    // console.log("click delete new movie", event.currentTarget.id);
     let movieID = event.currentTarget.id;
             db.deleteMovie(movieID)
                 .then(() => {
                 loadMoviesToDOM();
                 // debugger;
-                console.log("you deleted movie", db.deleteMovie);
+                // console.log("you deleted movie", db.deleteMovie);
                 });
 });
 
 // Using the REST API
 function loadMoviesToDOM() {
-  console.log("starting loadMoviesToDom function");
+  // console.log("starting loadMoviesToDom function");
   let currentUser = user.getUser();
-  console.log("currentUser in loadMovies", currentUser);
+  // console.log("currentUser in loadMovies", currentUser);
   db.getMovies(currentUser)
   // db.getSongs()
   .then((movieData) => {
-    //with users, this is already happening...
     //add the id to each song and then build the song list
-    // var idArray = Object.keys(songData);
-    // idArray.forEach((key) => {
-    //   songData[key].id = key;
-    // });
-    // console.log("song object with id", songData);
+    var keysArray = Object.keys(movieData);
+    keysArray.forEach((key) => {
+      movieData[key].FBkey = key;
+    });
+    console.log("movie object with FB keys", movieData);
     //now make the list with songData
     templates.populatePageAfterTracked(movieData);
-    console.log("loadMoviesToDOM", movieData);
+
+    // console.log("loadMoviesToDOM", movieData);
+
   });
 }
 
