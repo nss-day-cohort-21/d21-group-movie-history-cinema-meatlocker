@@ -14,17 +14,12 @@
 
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">OUR MOVIE DB</a>
+        <a class="navbar-brand" href="#"><img id="brand-img" src="img/cinema.png"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
         <div class="collapse navbar-collapse" id="navbarsExample03">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">My Movies <span class="sr-only">(current)</span></a>
-                </li>
-            </ul>
             <form class="form-inline my-2 my-md-0">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
@@ -32,7 +27,7 @@
                     </li>
                 </ul>
             </form>
-                <input class="form-control" id="dbSearch" type="text" placeholder="Search">
+                <input class="form-control" id="dbSearch" type="text" placeholder="Search for movies!">
             <form class="form-inline my-2 my-md-0">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
@@ -48,10 +43,18 @@
         <button type="button" id="untracked-btn" class="btn btn-primary">Untracked</button>
         <button type="button" id="unwatched-btn" class="btn btn-primary">Unwatched</button>
         <button type="button" id="watched-btn" class="btn btn-primary">Watched</button>
-        <button type="button" id="favs-btn" class="btn btn-primary">Favorites</button>
+        <!-- <button type="button" id="favs-btn" class="btn btn-primary">Favorites</button> -->
     </div>
 
-    <h1>Search some movies!</h1>
+        <!-- this is the slider -->
+    <div id="sliderContainer">
+        <input type="range" min="0" max="10" value="0" class="slider" id="mySlider">
+        <div>
+            <p class="sliderOutput" id="sliderPut">Stars: </p>
+        </div>
+    </div>
+
+    
 
         <ul id="castOutput"></ul>
 
@@ -61,6 +64,29 @@
 
 
   </div>
+</div>
+
+
+<!-- Movie Detail Modal -->
+<div>
+        <!-- Modal Style -->
+        <div id="movieDetail" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <!-- Modal Content -->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Movie Details</h4>
+              </div>
+              <div class="modal-body">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
 </div>
 
 
